@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  ProfilePhoto     String    @default("DefaultImage.jpg")
+  RatingHistory    UserRating[]
+  Id          String   @id @default(uuid())
+  Email       String   @unique
+  UserName    String   
+  Password    String
+  IsDoctor    Boolean  @default(false)
+  IsAdmin     Boolean  @default(false)
+  Doctor      doctor?  
+  Admin       Admin?
+  
+ 
+}
+
+model doctor {
+  numberOfRatings Int       @default(0)
+  UsersRatings    UserRating[]
+  Id              String    @id
+  rating          Float     @default(0)
+  User            User      @relation(fields: [Id], references: [Id])
+  CategoryId      String  
+  Category        Category  @relation(fields: [CategoryId] , references: [Id])
+  Clinics         Clinic[]
+
+}
+
+model Admin{
+  UserId  String  @unique  
+  User    User    @relation(fields: [UserId], references: [Id])
+
+}
+
+model Clinic{
+  Id                      String   @id @default(uuid())
+  Name                    String   @unique
+  DoctorId                String
+  Doctor                  doctor   @relation(fields: [DoctorId], references: [Id])
+  PhoneNumber             String
+  Location                String
+}
+
+model Category {
+  Id          String   @id @default(uuid())
+  Name        String   @unique
+  Doctors     doctor[]    
+  
+}
+
+model UserRating{
+
+  UserId      String   
+  DoctorId    String
+  rating      Float    
+  User        User    @relation(fields: [UserId], references: [Id])
+  Doctor      doctor  @relation(fields: [DoctorId] , references: [Id])
+
+
+  @@id([UserId , DoctorId])
+
+}
+
+
+
+
+  
+  
+ 
